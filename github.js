@@ -12,7 +12,7 @@ function main() {
   document.addEventListener('PJAX_PUSH_STATE_0923', function() {
     maybeAnnotatePage();
   });
-}
+} 
 
 function maybeAnnotatePage() {
   var page = new GitHubPage(document);
@@ -114,10 +114,10 @@ function GitHubPage(doc) {
         }
 
         // Replace unlinked code with linked code
-        fileElem.appendChild(sgContainer);
-        while (fileElem.firstChild && fileElem.firstChild.id != 'sg-container') {
+        while (fileElem.firstChild) {
           fileElem.removeChild(fileElem.firstChild);
         }
+        fileElem.appendChild(sgContainer);
 
         sourcegraph_activateDefnPopovers(fileElem);
       });
@@ -126,8 +126,11 @@ function GitHubPage(doc) {
 
   function getAnnotatedCode(info, codeElem, callback) {
     var url = baseURL + '/.api/repos/' + info.repoid + '@' + info.branch + '/.tree/' + info.path + '?Formatted=true&ContentsAsString=true';
+    //https://sourcegraph.com/.api/annotations?Entry.RepoRev.URI=github.com/gorilla/mux&Entry.RepoRev.Rev=master&Entry.RepoRev.CommitID=&Entry.Path=mux.go&Range.StartByte=0&Range.EndByte=0
     get(url, callback);
   }
+
+
 
   function getRepositoryBuild(repo_id, commitID, callback) {
     var url = baseURL + '/.api/repos/' + repo_id;

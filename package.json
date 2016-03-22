@@ -2,6 +2,10 @@
   "name": "sourcegraph-chrome-extension",
   "version": "0.1.1",
   "dependencies": {},
+  "scripts": {
+    "gulp": "gulp",
+    "serve": "gulp serve"
+  },
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-cli": "^0.1.13",

@@ -15,8 +15,10 @@ table {
 
 td{
     white-space: normal;
-    word-wrap: break-word;
+    word-wrap: break-word !important;
     padding-right:5px;
+    overflow:hidden;
+    max-width:931px;
 }
 
 tr{
@@ -24,10 +26,6 @@ tr{
 }
 
 
-td {
-	overflow:hidden;
-	max-width:931px;
-}
 input.tree-finder-input2, input.tree-finder-input2:focus {
     position: relative !important;
     top: 1px !important;
@@ -42,6 +40,10 @@ input.tree-finder-input2, input.tree-finder-input2:focus {
     outline: none !important;
     box-shadow: none !important;
     -webkit-appearance: none !important;
+}
+
+#tree-finder-field2 {
+    color:black;
 }
 #logo{
 	max-height:35px;
@@ -69,3 +71,56 @@ input.tree-finder-input2, input.tree-finder-input2:focus {
     text-align:center;
     font-weight: bold;
 }
+
+#sg-search-submit-button {
+    vertical-align:text-bottom;
+}
+
+#sg-search-kbd:hover{
+    background-color:#DDDDDD;
+}
+
+#sg-search-kbd:active{
+    box-shadow:inset 0px 0px 2px 2px #cacaca;
+    background-color:#DCDCDC;
+}
+
+#text-def {
+    font-size:13px;
+}
+
+.match{
+    background-color:#FFFFC1;
+    font-weight:bold;
+}
+
+#codelist{
+    display:none;
+}
+
+.one-fourth2{
+    width:25% !important;
+}
+.three-fourths2{
+    width:75% !important;
+}
+#codeCounter{
+    display:none;
+}
+#textCounter{
+    display:none;
+}
+
+#seeDefs {
+    cursor:pointer;
+}
+
+#seeText{
+    cursor:pointer;
+}
+
+.blob-code a {
+  color:inherit !important;
+}
+
+
