@@ -1,7 +1,24 @@
 var consumingSpan, annotating; 
 
+
 function main() {
-	getAnnotations()
+	mainCall();
+	
+	var pageScript = document.createElement('script');
+	pageScript.innerHTML = '$(document).on("pjax:success", function () { var evt = new Event("PJAX_PUSH_STATE_0923"); document.dispatchEvent(evt); });';
+	document.querySelector('body').appendChild(pageScript);
+	$(document).one('PJAX_PUSH_STATE_0923', function() {
+		console.log('pjax')
+		mainCall();
+	})
+}
+function mainCall() {
+
+	var fileElem = document.querySelector('.file .blob-wrapper')
+	if (fileElem) {
+		getAnnotations()
+	}
+
 }
 
 function getAnnotations() {
@@ -39,11 +56,13 @@ function getSourcegraphRefLinks(data) {
 			annsByEndByte[ann.EndByte] = ann;
 		}
 	}
-	traverseDOM(annsByStartByte, annsByEndByte); 
+	traverseDOM(annsByStartByte, annsByEndByte);
 }
 
 
 function traverseDOM(annsByStartByte, annsByEndByte){
+	console.time("traverseDOM"); 
+
 	var table = document.querySelector('table');
 	var count = 0;
 	var refLink;
@@ -114,11 +133,13 @@ function traverseDOM(annsByStartByte, annsByEndByte){
 		for (var n = 0; n < newRows.length; n++){
 			sourcegraph_activateDefnPopovers(newRows[n])
 				
-		}	
+		}
 	
 	}
-
-
+	if (document.getElementsByClassName('sourcegraph-popover visible').length !== 0){
+		document.getElementsByClassName('sourcegraph-popover visible')[0].classList.remove('visible')
+	}
+	console.timeEnd("traverseDOM")
 
 }
 
@@ -135,13 +156,13 @@ function next(c, byteCount, annsByStartByte, annsByEndByte) {
 	
 	//if there is a match
 	if (annotating===false && matchDetails !== undefined) { 
-		if (annsByStartByte[byteCount].EndByte - annsByStartByte[byteCount].StartByte === 1 ){
-			return '<a href="https://sourcegraph.com' + matchDetails.URL+'" target="blank" class="sgdef">'+c+'</a>'
+		if (annsByStartByte[byteCount].EndByte - annsByStartByte[byteCount].StartByte === 1){
+			return '<a href="https://sourcegraph.com' + matchDetails.URL+'" target="tab" class="sgdef">'+c+'</a>'
 		}
 		
 		annotating = true;
 		//console.log(byteCount) 
-		return '<a href="https://sourcegraph.com' + matchDetails.URL+'" target="blank" class="sgdef">'+c
+		return '<a href="https://sourcegraph.com' + matchDetails.URL+'" target="tab" class="sgdef">'+c
 	}
 
 	//if we reach the end of the child node - our counter = endByte of the match, annotating = false, close the tag.  
@@ -160,12 +181,4 @@ function next(c, byteCount, annsByStartByte, annsByEndByte) {
 
 }
 	
-$(document).ready(function(){
-	var pageScript = document.createElement('script');
-	pageScript.innerHTML = '$(document).on("pjax:success", function () { var evt = new Event("PJAX_PUSH_STATE_0923"); document.dispatchEvent(evt); });';
-	document.querySelector('body').appendChild(pageScript);
-	document.addEventListener('PJAX_PUSH_STATE_0923', function() {
-		main();
-	})
-	main();
-}) 
+main();

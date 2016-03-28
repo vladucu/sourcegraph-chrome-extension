@@ -8,8 +8,8 @@ $border-radius-base:        4px !default;
 
 .sourcegraph-popover {
   background-color: rgba(255, 255, 255, 0.93);
-  max-width: 360px;
-  width: 360px;
+  max-width: 360px !important;
+  width: 360px !important;
 
   border: solid 1px lighten($popover-border-color, 5%);
   border-radius: $border-radius-base;

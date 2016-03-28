@@ -2,13 +2,15 @@
 var url, query, user, repo, branch, 
 	original, table, nomatch, notextmatch,
 	taburl, 
-	getDefs, getText, prevFile,
+	getDefs, getText, prevFile, commitID,
 	repoIsGo = true;
 var current = '';
 var logo2 = document.createElement('img');
 logo2.src = chrome.extension.getURL("assets/src4.png");
 var search = document.createElement('img');
 search.src = chrome.extension.getURL("assets/search.png");
+var t = document.createElement('img')
+t.src = chrome.extension.getURL ("assets/t.png")
 
 //get response from background page 
 chrome.runtime.sendMessage({query: 'whoami'}, function(response){
@@ -21,8 +23,15 @@ chrome.runtime.sendMessage({query: 'whoami'}, function(response){
 	if (urlsplit[6] !== null && (urlsplit[5]==='tree' || urlsplit[5]==='blob')) {
 		branch = urlsplit[6];
 	}
-	url = "https://sourcegraph.com/.ui/github.com/"+user+"/"+repo+"@"+branch+"/.search/tokens?q="+query+"&PerPage=50&Page=1" //url
-	table = "<div class='column one-fourth2 codesearch-aside' id='toRemove'> <nav class='menu' data-pjax=''> <a role='button' id='seeDefs' class='menu-item'><svg aria-hidden='true' class='octicon octicon-code' height='16' role='img' version='1.1' viewBox='0 0 14 16' width='14'><path d='M9.5 3l-1.5 1.5 3.5 3.5L8 11.5l1.5 1.5 4.5-5L9.5 3zM4.5 3L0 8l4.5 5 1.5-1.5L2.5 8l3.5-3.5L4.5 3z'></path></svg>Code<span class='counter' id='codeCounter'></span></a><a role ='button' id='seeText' class='menu-item'>Text<span class='counter' id='textCounter'></span></a> </nav></div><div class='column three-fourths2 codesearch-results' id='toRemove' style='float:right'><div class='repository-content' id='toRemove'> <div class='breadcrumb flex-table'> <div class='flex-table-item'> <span class='bold'><a href=/"+user+"/"+repo+">"+repo+"</a></span> / </div> <input type='text' name='query' autocomplete='off' spellcheck='false' autofocus='' id='tree-finder-field2' data-results='tree-finder-results' style='width:99%' class='tree-finder-input2' role='search' js-tree-finder-field js-navigation-enable flex-table-item-primary'><div class='flex-table-item'><button id='sg-search-submit-button' class='btn btn-sm empty-icon right js-show-file-finder' type='submit' tabindex='3'>Search</button></div></div><div id='loadingDiv' style='display:none'>Searching...</div ><div class='tree-finder clearfix' data-pjax=''><div class='flash-messages js-notice'> <div class='flash' ><form accept-charset='UTF-8' action='/sourcegraph/go-git/dismiss-tree-finder-help' class='flash-close js-notice-dismiss' data-form-nonce='9e84d03d8bcc6640b285af494d66a530ef543a51' data-remote='true' method='post'><div style='margin:0;padding:0;display:inline'><input name='utf8' type='hidden' value='✓'><input name='authenticity_token' type='hidden' value='mP8EUglfiCcfAl1tEEOFKkAhyNAQG/mxzCkwmqqhKapITZjnk06XW6lB6kmSxo6NLU6sI+cwDHdqrUlZiewlBA=='></div> </form> Type in a query and press <kbd>enter</kbd> to view results.  Press <kbd>esc</kbd> to exit. </br>  Powered by <a href='https://sourcegraph.com'>Sourcegraph</a>. </div> </div> <table id='tree-finder-results2' class='tree-browser css-truncate' cellpadding='0' cellspacing='0' width='100%' style='border-bottom:1px solid #;cacaca;width:100%'> <tbody class='tree-browser-result-template js-tree-browser-result-template'> <tr class='js-navigation-item tree-browser-result'><td> <a class='css-truncate-target js-navigation-open js-tree-finder-path'></a></td> </tr> </tbody> </table></div>"; 
+	//if repo page
+	if (document.getElementsByClassName('repository-meta').length !== 0){
+		commitID = document.getElementsByClassName('commit-tease-sha')[0].href.split("/")[6]
+	}
+	//if file page
+	if (document.getElementsByClassName('file').length !== 0) {
+		commitID =document.getElementsByClassName('js-permalink-shortcut')[0].href.split("/")[6]
+	}
+	table = "<div class='column one-fourth2 codesearch-aside' id='toRemove'> <nav class='menu' data-pjax=''> <a role='button' id='seeDefs' class='menu-item'><svg aria-hidden='true' class='octicon octicon-code' height='16' role='img' version='1.1' viewBox='0 0 14 16' width='14'><path d='M9.5 3l-1.5 1.5 3.5 3.5L8 11.5l1.5 1.5 4.5-5L9.5 3zM4.5 3L0 8l4.5 5 1.5-1.5L2.5 8l3.5-3.5L4.5 3z'></path></svg>Code<span class='counter' id='codeCounter'></span></a><a role ='button' id='seeText' class='menu-item'><img id='t' src="+t.src+">Text<span class='counter' id='textCounter'></span></a> </nav></div><div class='column three-fourths2 codesearch-results' id='toRemove' style='float:right'><div class='repository-content' id='toRemove'> <div class='breadcrumb flex-table'> <div class='flex-table-item'> <span class='bold'><a href=/"+user+"/"+repo+">"+repo+"</a></span> / </div> <input type='text' name='query' autocomplete='off' spellcheck='false' autofocus='' id='tree-finder-field2' data-results='tree-finder-results' style='width:99%' class='tree-finder-input2' role='search' js-tree-finder-field js-navigation-enable flex-table-item-primary'><div class='flex-table-item'><button id='sg-search-submit-button' class='btn btn-sm empty-icon right js-show-file-finder' type='submit' tabindex='3'>Search</button></div></div><div id='loadingDiv' style='display:none'>Searching...</div ><div class='tree-finder clearfix' data-pjax=''><div class='flash-messages js-notice'> <div class='flash' ><form accept-charset='UTF-8' action='/sourcegraph/go-git/dismiss-tree-finder-help' class='flash-close js-notice-dismiss' data-form-nonce='9e84d03d8bcc6640b285af494d66a530ef543a51' data-remote='true' method='post'><div style='margin:0;padding:0;display:inline'><input name='utf8' type='hidden' value='✓'><input name='authenticity_token' type='hidden' value='mP8EUglfiCcfAl1tEEOFKkAhyNAQG/mxzCkwmqqhKapITZjnk06XW6lB6kmSxo6NLU6sI+cwDHdqrUlZiewlBA=='></div> </form> Type in a query and press <kbd>enter</kbd> to view results.  Press <kbd>esc</kbd> to exit. </br>  Powered by <a href='https://sourcegraph.com'>Sourcegraph</a>. </div> </div> <table id='tree-finder-results2' class='tree-browser css-truncate' cellpadding='0' cellspacing='0' width='100%' style='border-bottom:1px solid #;cacaca;width:100%'> <tbody class='tree-browser-result-template js-tree-browser-result-template'> <tr class='js-navigation-item tree-browser-result'><td> <a class='css-truncate-target js-navigation-open js-tree-finder-path'></a></td> </tr> </tbody> </table></div>"; 
 
 	var pageScript = document.createElement('script');
 	pageScript.innerHTML = '$(document).on("pjax:success", function () { var evt = new Event("PJAX_PUSH_STATE_0923"); document.dispatchEvent(evt); });';
@@ -37,10 +46,10 @@ chrome.runtime.sendMessage({query: 'whoami'}, function(response){
 
 
 $(window).on('popstate', function(){
-	document.getElementById('sg-search-button-container').addEventListener("click", buttonClick);
-	document.getElementById('sg-search-submit-button').addEventListener("click", clickSubmitButton);
-	document.getElementById('seeText').addEventListener("click", showtext);
-	document.getElementById('seeDefs').addEventListener("click", showdefs);
+	try{document.getElementById('sg-search-button-container').addEventListener("click", buttonClick)}catch(err){};
+	try{document.getElementById('sg-search-submit-button').addEventListener("click", clickSubmitButton)}catch(err){};
+	try{document.getElementById('seeText').addEventListener("click", showtext)}catch(err){};
+	try{document.getElementById('seeDefs').addEventListener("click", showdefs)}catch(err){};
 });
 
 
@@ -58,20 +67,25 @@ $(document).ready(function(){
 
 //Checks if the language of the repository is Go  
 function checkLanguageAjax(user, repo){
-	$.ajax ({
+	checkLang = $.ajax ({
 		method: "GET",
 		url: "https://api.github.com/repos/"+user+"/"+repo+"/languages"
 	}).done(function(e){
-		console.log(e);
+		//console.log(e);
 		if (e["Go"]) {
 			addSearchButton();
 			repoIsGo = true;
 			return;		
-		}	
+		}
+	});
+	checkLang.fail(function(e){
+		repoIsGo=true;
+		return;
+	})
 	repoIsGo = false;
 	return;
-	})
 }
+
 
 
 
@@ -88,7 +102,7 @@ function addSearchButton (){
 	document.getElementById('sg-search-button-container').addEventListener("click", buttonClick);
 }
 
-//when search button is clicked
+//handler when search button is clicked
 function buttonClick(){
 	countScrolls=1;
 
@@ -118,14 +132,14 @@ function buttonClick(){
 	current='';
 	document.getElementById('sg-search-button-container').addEventListener("click", buttonClick);
 	document.getElementById('sg-search-submit-button').addEventListener("click", clickSubmitButton);
-	document.getElementById('seeText').addEventListener("click", showtext);
+	//document.getElementById('seeText').addEventListener("click", showtext);
 	document.getElementById('seeDefs').addEventListener("click", showdefs);
 	$('#seeDefs:last').addClass(' selected');
 
 }
 
 
-//clicking submit button
+//handler for clicking submit button
 function clickSubmitButton(){
 	//table that replaces existing one during a search (does not include search bar)
 	var table2 = "<table id='tree-finder-results2' class='tree-browser css-truncate' cellpadding='0' cellspacing='0' style='border-bottom:1px solid #;cacaca'> <tbody class='tree-browser-result-template js-tree-browser-result-template' aria-hidden='true'> <tr class='js-navigation-item tree-browser-result'><td> <a class='css-truncate-target js-navigation-open js-tree-finder-path'></a> </td> </tr> </tbody> </table>";
@@ -155,7 +169,7 @@ function clickSubmitButton(){
 	$('.tree-finder-input2:last').focus();
 	current=query;
 
-	amplitude.logEvent('SEARCH');
+	/*amplitude.logEvent('SEARCH');*/
 }
 
 
@@ -169,18 +183,17 @@ function keyboardevents (e) {
 	if (e.which===84 && e.shiftKey && (e.target.tagName.toLowerCase()) !=='input' && (e.target.tagName.toLowerCase())!=='textarea') {
 		if (repoIsGo){
 
-	    //store value of current page
-	    countScrolls=1;
+			countScrolls=1;
 
-	    if ($('.container.new-discussion-timeline').not(':has(#toRemove)')) {
-	      original = $('.container.new-discussion-timeline').children().html();
-	    }
-		
-		if (document.getElementById('toRemove')) {
-			$('div').remove("#toRemove");
-		}
+			if ($('.container.new-discussion-timeline').not(':has(#toRemove)')) {
+				original = $('.container.new-discussion-timeline').children().html();
+			}
 
-		
+			if (document.getElementById('toRemove')) {
+				$('div').remove("#toRemove");
+			}
+
+
 		//hide current page, show search bar 
 		$('.container.new-discussion-timeline').children().hide();
 		$('.container.new-discussion-timeline').append(table);
@@ -202,12 +215,14 @@ function keyboardevents (e) {
 
 		current='';
 		try{document.getElementById('sg-search-button-container').addEventListener("click", buttonClick);}catch(err){};
-		document.getElementById('sg-search-submit-button').addEventListener("click", clickSubmitButton);
-		document.getElementById('seeText').addEventListener("click", showtext);
-		document.getElementById('seeDefs').addEventListener("click", showdefs);
+		try{document.getElementById('sg-search-submit-button').addEventListener("click", clickSubmitButton)}catch(err){};
+		//document.getElementById('seeText').addEventListener("click", showtext);
+		//document.getElementById('seeDefs').addEventListener("click", showdefs);
 	}
-	}
+}
 
+
+	//press enter key to submit
 	else if (e.which===13 && (e.target.tagName.toLowerCase())==='input') {
 		e.stopImmediatePropagation();
 		countScrolls=1;
@@ -243,11 +258,11 @@ function keyboardevents (e) {
 
     	current=query;
 
-		amplitude.logEvent('SEARCH');
+		/*amplitude.logEvent('SEARCH');*/
 
 	}
 
-
+	//Press esc to hide
 	else if (e.keyCode === 27) {
 		$('div').remove("#toRemove");
 		$('.repository-content').show();
@@ -275,7 +290,8 @@ function ajaxCall() {
 	document.getElementById("loadingDiv").style.display='block'
 	getDefs = $.ajax ({
 		method: "GET",
-		url: "https://sourcegraph.com/.ui/github.com/"+user+"/"+repo+"@"+branch+"/.search/tokens?q="+query+"&PerPage=1000&Page=1"
+		url: "https://sourcegraph.com/.api/.defs?RepoRevs=github.com%2F"+user+"%2F"+repo+"@"+commitID+"&Nonlocal=true&Query="+query
+		//url: "https://sourcegraph.com/.ui/github.com/"+user+"/"+repo+"@"+branch+"/.search/tokens?q="+query+"&PerPage=1000&Page=1"
 	}).done(removeDefLoadingDiv, showDefResults);
 	getDefs.fail(function(jqXHR, textStatus, errorThrown) {
 		console.log (textStatus);
@@ -295,6 +311,7 @@ function ajaxCall() {
 			$('.tree-finder.clearfix:last').after(nomatch);
 		}
 	});
+	/*
 	getText = $.ajax ({
 		method: "GET",
 		url: "https://sourcegraph.com/.ui/github.com/"+user+"/"+repo+"@"+branch+"/.search/text?q="+query+"&PerPage=10&Page=1"
@@ -316,7 +333,7 @@ function ajaxCall() {
 				try{$('#nodefmatch').remove()}catch(err){}
 			}
 		}
-	});
+	});*/
 }
 
 
@@ -326,32 +343,37 @@ function showDefResults(dataArray) {
 		$('#tree-finder-results2').attr("style", "display:none");
     }
 	document.getElementById('codeCounter').style.display='block';
-	document.getElementById('codeCounter').innerHTML = dataArray.Total;
+	console.log(dataArray)
 
-	if (dataArray.Results.length===0 && !(document.getElementById('404nomatch'))) {		
+	if (!dataArray.Defs && !(document.getElementById('404nomatch'))) {		
 		nomatch = "<div class='nomatch' id='nodefmatch'><p style='text-align:center;font-size:16px'><b> No matching definitions found. </br></b></p></div>";
 		$('.tree-finder.clearfix:last').after(nomatch);
 		if ($('#seeText').hasClass('selected')) {
 			try{document.getElementById('nodefmatch').style.display='none'}catch(err){}
 		}
 		$('.tree-browser:last').attr("style","border-top:none;border-bottom:none;");
+		document.getElementById('codeCounter').innerHTML = "0";
+
+		return;
 	}
 
+	document.getElementById('codeCounter').innerHTML = dataArray.Total;
 
-	for(var i =0; i<dataArray.Results.length;i++) {
-		var eachRes = dataArray.Results[i];
-		var repWideQualified = eachRes.Def.FmtStrings.Type.RepositoryWideQualified;
+	for(var i =0; i<dataArray.Defs.length;i++) {
+		var eachRes = dataArray.Defs[i];
+		var repWideQualified = eachRes.FmtStrings.Type.RepositoryWideQualified;
 		if (repWideQualified === undefined) {
 			repWideQualified = ''; 
 		}
-		var strToReturn = eachRes.QualifiedName.__html;
-		var hrefurl = eachRes.URL;
+		var strToReturn = "<span style=color:#4078C0>" + eachRes.FmtStrings.Name.ScopeQualified + "</span>" + eachRes.FmtStrings.Type.ScopeQualified;
+		console.log(strToReturn)
+		var hrefurl = "https://sourcegraph.com/"+eachRes.Repo+"/.GoPackage/"+eachRes.Repo+"/.def/"+eachRes.Path;
 
-		if (i !== dataArray.Results.length-1) { 
-			$('.tree-browser:last tbody:last').after("<tbody class='js-tree-finder-results'><tr id='searchrow' class='js-navigation-item tree-browser-result' style='border-bottom: 1px solid rgb(238, 238, 238);'><td class='icon' width='21px'><svg aria-hidden='true' class='octicon octicon-chevron-right' height='16' role='img' version='1.1' viewBox='0 0 8 16' width='8'><path d='M7.5 8L2.5 13l-1.5-1.5 3.75-3.5L1 4.5l1.5-1.5 5 5z'></path></svg></td><td class='icon'><svg aria-hidden='true' class='octicon octicon-file-text' height='16' role='img' version='1.1' viewBox='0 0 12 16' width='12'><path d='M6 5H2v-1h4v1zM2 8h7v-1H2v1z m0 2h7v-1H2v1z m0 2h7v-1H2v1z m10-7.5v9.5c0 0.55-0.45 1-1 1H1c-0.55 0-1-0.45-1-1V2c0-0.55 0.45-1 1-1h7.5l3.5 3.5z m-1 0.5L8 2H1v12h10V5z'></path></svg></td></td><td><a href=https://sourcegraph.com"+hrefurl+" target='blank'><span class='res'>"+eachRes.Def.Kind+ " "+ strToReturn + "</span></a></td></tr></tbody>");
+		if (i !== dataArray.Defs.length-1) { 
+			$('.tree-browser:last tbody:last').after("<tbody class='js-tree-finder-results'><tr id='searchrow' class='js-navigation-item tree-browser-result' style='border-bottom: 1px solid rgb(238, 238, 238);'><td class='icon' width='21px'><svg aria-hidden='true' class='octicon octicon-chevron-right' height='16' role='img' version='1.1' viewBox='0 0 8 16' width='8'><path d='M7.5 8L2.5 13l-1.5-1.5 3.75-3.5L1 4.5l1.5-1.5 5 5z'></path></svg></td><td class='icon'><svg aria-hidden='true' class='octicon octicon-file-text' height='16' role='img' version='1.1' viewBox='0 0 12 16' width='12'><path d='M6 5H2v-1h4v1zM2 8h7v-1H2v1z m0 2h7v-1H2v1z m0 2h7v-1H2v1z m10-7.5v9.5c0 0.55-0.45 1-1 1H1c-0.55 0-1-0.45-1-1V2c0-0.55 0.45-1 1-1h7.5l3.5 3.5z m-1 0.5L8 2H1v12h10V5z'></path></svg></td></td><td><a href="+hrefurl+" target='blank'><span class='res'>"+eachRes.Kind+ " "+ strToReturn + "</span></a></td></tr></tbody>");
 		}
 		else {
-			$('.tree-browser:last tbody:last').after("<tbody class='js-tree-finder-results'><tr id='searchrow' class='js-navigation-item tree-browser-result'><td id='icon' style='width:21px;padding-left:10px'><svg aria-hidden='true' class='octicon octicon-chevron-right' height='16' role='img' version='1.1' viewBox='0 0 8 16' width='8'><path d='M7.5 8L2.5 13l-1.5-1.5 3.75-3.5L1 4.5l1.5-1.5 5 5z'></path></svg></td><td class='icon'><svg aria-hidden='true' class='octicon octicon-file-text' height='16' role='img' version='1.1' viewBox='0 0 12 16' width='12'><path d='M6 5H2v-1h4v1zM2 8h7v-1H2v1z m0 2h7v-1H2v1z m0 2h7v-1H2v1z m10-7.5v9.5c0 0.55-0.45 1-1 1H1c-0.55 0-1-0.45-1-1V2c0-0.55 0.45-1 1-1h7.5l3.5 3.5z m-1 0.5L8 2H1v12h10V5z'></path></svg></td></td><td><a href=https://sourcegraph.com"+hrefurl+" target='blank'><span class='res'>"+eachRes.Def.Kind + " " + strToReturn + "</span></a></td></tr></tbody>");
+			$('.tree-browser:last tbody:last').after("<tbody class='js-tree-finder-results'><tr id='searchrow' class='js-navigation-item tree-browser-result'><td id='icon' style='width:21px;padding-left:10px'><svg aria-hidden='true' class='octicon octicon-chevron-right' height='16' role='img' version='1.1' viewBox='0 0 8 16' width='8'><path d='M7.5 8L2.5 13l-1.5-1.5 3.75-3.5L1 4.5l1.5-1.5 5 5z'></path></svg></td><td class='icon'><svg aria-hidden='true' class='octicon octicon-file-text' height='16' role='img' version='1.1' viewBox='0 0 12 16' width='12'><path d='M6 5H2v-1h4v1zM2 8h7v-1H2v1z m0 2h7v-1H2v1z m0 2h7v-1H2v1z m10-7.5v9.5c0 0.55-0.45 1-1 1H1c-0.55 0-1-0.45-1-1V2c0-0.55 0.45-1 1-1h7.5l3.5 3.5z m-1 0.5L8 2H1v12h10V5z'></path></svg></td></td><td><a href="+hrefurl+" target='blank'><span class='res'>"+eachRes.Kind + " " + strToReturn + "</span></a></td></tr></tbody>");
 		}
 
 	}
@@ -361,7 +383,7 @@ function showDefResults(dataArray) {
 
 /* --------------------------------------------Text search --------------------------------------------------------------*/
 //https://sourcegraph.com/.ui/github.com/attfarhan/mux@master/.search/text?q=route&PerPage=10&Page=1
-
+/*
 //show text results
 function showTextResults(dataArray){
 
@@ -529,7 +551,7 @@ function infiniteTextResults(dataArray){
 
 }
 
-
+/*
 //amplitude tracking
 document.addEventListener('DOMContentLoaded', function(){
 	(function(e,t){var n=e.amplitude||{_q:[],_iq:{}};var r=t.createElement("script");r.type="text/javascript";
@@ -545,4 +567,4 @@ document.addEventListener('DOMContentLoaded', function(){
 	})(window, document);
 	amplitude.init("f7491eae081c8c94baf15838b0166c63");
 })	
-
+*/

@@ -104,9 +104,20 @@ input.tree-finder-input2, input.tree-finder-input2:focus {
 .three-fourths2{
     width:75% !important;
 }
+
+#t{
+    max-height:14px;
+    max-width:20px;
+    vertical-align: text-top;
+    margin: 0 5px 0 0;
+    padding-right:4px;
+}
+
+
 #codeCounter{
     display:none;
 }
+
 #textCounter{
     display:none;
 }
