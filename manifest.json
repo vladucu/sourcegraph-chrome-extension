@@ -8,11 +8,11 @@
 	"content_scripts": [
 		{
 		"matches": ["https://github.com/*"],
-		"css": ["sgsearch.css", "defn_popover.css"],
+		"css": ["sgsearch.css", "github.css", "defn_popover.css"],
 		"js": ["jquery-1.12.0.min.js", "annotations.js", "sgsearch.js", "defn-popover.js"]
 		
 		}],
-	"web_accessible_resources": ["sgsearch.css", "defn_popover.css", "assets/t.png", "/assets/src4.png", "/assets/search.png"],
+	"web_accessible_resources": ["sgsearch.css", "github.css", "defn_popover.css", "assets/t.png", "/assets/src4.png", "/assets/search.png"],
 	"background": {
 		"scripts": ["background_page.js"]
 
@@ -20,6 +20,7 @@
 	"permissions": [
 		"activeTab",
 		"https://sourcegraph.com/*",
+		"https://*.sourcegraph.com/*",
 		"storage"
 		],
 

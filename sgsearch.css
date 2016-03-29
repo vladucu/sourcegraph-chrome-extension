@@ -18,11 +18,11 @@ td{
     word-wrap: break-word !important;
     padding-right:5px;
     overflow:hidden;
-    max-width:931px;
+    max-width:668px;
 }
 
 tr{
-	max-width:978px;
+	max-width:670px;
 }
 
 
@@ -62,6 +62,11 @@ input.tree-finder-input2, input.tree-finder-input2:focus {
 .name {
     color:#4078C0;
 }
+
+#tree-finder-results2 {
+    max-width:715px ;
+}
+
 
 #loadingDiv {
     font-size:16px;

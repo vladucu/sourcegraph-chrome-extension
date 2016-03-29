@@ -7,11 +7,11 @@ function main() {
 	var pageScript = document.createElement('script');
 	pageScript.innerHTML = '$(document).on("pjax:success", function () { var evt = new Event("PJAX_PUSH_STATE_0923"); document.dispatchEvent(evt); });';
 	document.querySelector('body').appendChild(pageScript);
-	$(document).one('PJAX_PUSH_STATE_0923', function() {
-		console.log('pjax')
-		mainCall();
-	})
+	var mainCallOnce = debounce(mainCall,250);
+
+	(document).addEventListener('PJAX_PUSH_STATE_0923', mainCallOnce)
 }
+
 function mainCall() {
 
 	var fileElem = document.querySelector('.file .blob-wrapper')
@@ -108,7 +108,7 @@ function traverseDOM(annsByStartByte, annsByEndByte){
 
             //go through each char of childNodes
             for (var k = 0; k < childNodeChars.length; k++) {
-            	if (childNodeChars[k] === "<") {
+            	if (childNodeChars[k] === "<" && childNodeChars[k+1] !== " ") {
             		consumingSpan = true;
             	}
             		
@@ -121,14 +121,17 @@ function traverseDOM(annsByStartByte, annsByEndByte){
                 }
 
                 if (childNodeChars[k] === ">") {
+            		
             		consumingSpan = false;
             	}
 
 
             }
 		}
-		//console.log(output)
+		
+		//replace each line
 		code.innerHTML = output;
+		
 		var newRows = row.cells[1].childNodes
 		for (var n = 0; n < newRows.length; n++){
 			sourcegraph_activateDefnPopovers(newRows[n])
@@ -146,8 +149,11 @@ function traverseDOM(annsByStartByte, annsByEndByte){
 
 
 function next(c, byteCount, annsByStartByte, annsByEndByte) {
+	/*if (byteCount < 2500) {
+		console.log("byteCount", byteCount, c);
+
+	}*/
 	//console.log(annsByStartByte !== undefined, byteCount);
-	//console.log("byteCount", byteCount, c);
 
 	
 
@@ -180,5 +186,26 @@ function next(c, byteCount, annsByStartByte, annsByEndByte) {
 
 
 }
-	
+
+// Returns a function, that, as long as it continues to be invoked, will not
+// be triggered. The function will be called after it stops being called for
+// N milliseconds. If `immediate` is passed, trigger the function on the
+// leading edge, instead of the trailing.
+// As seen here: https://davidwalsh.name/javascript-debounce-function 
+function debounce(func, wait, immediate) {
+	var timeout;
+	return function() {
+		var context = this, args = arguments;
+		var later = function() {
+			timeout = null;
+			if (!immediate) func.apply(context, args);
+		};
+		var callNow = immediate && !timeout;
+		clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+		if (callNow) func.apply(context, args);
+	};
+};
+
+
 main();
