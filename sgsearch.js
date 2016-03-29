@@ -29,7 +29,7 @@ chrome.runtime.sendMessage({query: 'whoami'}, function(response){
 	if (document.getElementsByClassName('file').length !== 0) {
 		commitID =document.getElementsByClassName('js-permalink-shortcut')[0].href.split("/")[6]
 	}
-	else {
+	else if (document.getElementsByClassName('entry-title').length !== 0) {
 		commitID = document.getElementsByClassName('commit-tease-sha')[0].href.split("/")[6]
 	}
 	table = "<div class='column one-fourth2 codesearch-aside' id='toRemove'> <nav class='menu' data-pjax=''> <a role='button' id='seeDefs' class='menu-item'><svg aria-hidden='true' class='octicon octicon-code' height='16' role='img' version='1.1' viewBox='0 0 14 16' width='14'><path d='M9.5 3l-1.5 1.5 3.5 3.5L8 11.5l1.5 1.5 4.5-5L9.5 3zM4.5 3L0 8l4.5 5 1.5-1.5L2.5 8l3.5-3.5L4.5 3z'></path></svg>Code<span class='counter' id='codeCounter'></span></a><a role ='button' id='seeText' class='menu-item'><img id='t' src="+t.src+">Text<span class='counter' id='textCounter'></span></a> </nav></div><div class='column three-fourths2 codesearch-results' id='toRemove' style='float:right'><div class='repository-content' id='toRemove'> <div class='breadcrumb flex-table'> <div class='flex-table-item'> <span class='bold'><a href=/"+user+"/"+repo+">"+repo+"</a></span> / </div> <input type='text' name='query' autocomplete='off' spellcheck='false' autofocus='' id='tree-finder-field2' data-results='tree-finder-results' style='width:99%' class='tree-finder-input2' role='search' js-tree-finder-field js-navigation-enable flex-table-item-primary'><div class='flex-table-item'><button id='sg-search-submit-button' class='btn btn-sm empty-icon right js-show-file-finder' type='submit' tabindex='3'>Search</button></div></div><div id='loadingDiv' style='display:none'>Searching...</div ><div class='tree-finder clearfix' data-pjax=''><div class='flash-messages js-notice'> <div class='flash' ><form accept-charset='UTF-8' action='/sourcegraph/go-git/dismiss-tree-finder-help' class='flash-close js-notice-dismiss' data-form-nonce='9e84d03d8bcc6640b285af494d66a530ef543a51' data-remote='true' method='post'><div style='margin:0;padding:0;display:inline'><input name='utf8' type='hidden' value='✓'><input name='authenticity_token' type='hidden' value='mP8EUglfiCcfAl1tEEOFKkAhyNAQG/mxzCkwmqqhKapITZjnk06XW6lB6kmSxo6NLU6sI+cwDHdqrUlZiewlBA=='></div> </form> Type in a query and press <kbd>enter</kbd> to view results.  Press <kbd>esc</kbd> to exit. </br>  Powered by <a href='https://sourcegraph.com'>Sourcegraph</a>. </div> </div> <table id='tree-finder-results2' class='tree-browser css-truncate' cellpadding='0' cellspacing='0' width='100%' style='border-bottom:1px solid #;cacaca;width:100%'> <tbody class='tree-browser-result-template js-tree-browser-result-template'> <tr class='js-navigation-item tree-browser-result'><td> <a class='css-truncate-target js-navigation-open js-tree-finder-path'></a></td> </tr> </tbody> </table></div>"; 
@@ -308,6 +308,7 @@ function ajaxCall() {
 					nomatch ="<div class='nomatch' id='404nomatch'><p style='text-align:center;font-size:16px'><b> This repository has not been analyzed by Sourcegraph yet.</br> Click the link below to activate search on this repository: <a href='https://sourcegraph.com/github.com/"+user+"/"+repo+"' target='none'>sourcegraph.com/github.com/"+user+"/"+repo+"</a> </b></p></div>"
 				}
 			}
+			document.getElementById('codeCounter').innerHTML = "0";
 			removeDefLoadingDiv();
 			$('.tree-finder.clearfix:last').after(nomatch);
 		}
@@ -334,6 +335,7 @@ function ajaxCall() {
 				try{$('#nodefmatch').remove()}catch(err){}
 			}
 		}
+		document.getElementById('codeCounter').innerHTML = "0";
 	});
 }
 
@@ -358,25 +360,27 @@ function showDefResults(dataArray) {
 		return;
 	}
 
-	document.getElementById('codeCounter').innerHTML = dataArray.Total;
+	if (dataArray.Defs){
+	document.getElementById('codeCounter').innerHTML = dataArray.Defs.length;
 
-	for(var i =0; i<dataArray.Defs.length;i++) {
-		var eachRes = dataArray.Defs[i];
-		var repWideQualified = eachRes.FmtStrings.Type.RepositoryWideQualified;
-		if (repWideQualified === undefined) {
-			repWideQualified = ''; 
-		}
-		var strToReturn = "<span style=color:#4078C0>" + eachRes.FmtStrings.Name.ScopeQualified + "</span>" + eachRes.FmtStrings.Type.ScopeQualified;
+		for(var i =0; i<dataArray.Defs.length;i++) {
+			var eachRes = dataArray.Defs[i];
+			var repWideQualified = eachRes.FmtStrings.Type.RepositoryWideQualified;
+			if (repWideQualified === undefined) {
+				repWideQualified = ''; 
+			}
+			var strToReturn = "<span style=color:#4078C0>" + eachRes.FmtStrings.Name.ScopeQualified + "</span>" + eachRes.FmtStrings.Type.ScopeQualified;
 		//console.log(strToReturn)
-		var hrefurl = "https://sourcegraph.com/"+eachRes.Repo+"/.GoPackage/"+eachRes.Unit+"/.def/"+eachRes.Path;
+			var hrefurl = "https://sourcegraph.com/"+eachRes.Repo+"/.GoPackage/"+eachRes.Unit+"/.def/"+eachRes.Path;
 
-		if (i !== dataArray.Defs.length-1) { 
-			$('.tree-browser:last tbody:last').after("<tbody class='js-tree-finder-results'><tr id='searchrow' class='js-navigation-item tree-browser-result' style='border-bottom: 1px solid rgb(238, 238, 238);'><td class='icon' width='21px'><svg aria-hidden='true' class='octicon octicon-chevron-right' height='16' role='img' version='1.1' viewBox='0 0 8 16' width='8'><path d='M7.5 8L2.5 13l-1.5-1.5 3.75-3.5L1 4.5l1.5-1.5 5 5z'></path></svg></td><td class='icon'><svg aria-hidden='true' class='octicon octicon-file-text' height='16' role='img' version='1.1' viewBox='0 0 12 16' width='12'><path d='M6 5H2v-1h4v1zM2 8h7v-1H2v1z m0 2h7v-1H2v1z m0 2h7v-1H2v1z m10-7.5v9.5c0 0.55-0.45 1-1 1H1c-0.55 0-1-0.45-1-1V2c0-0.55 0.45-1 1-1h7.5l3.5 3.5z m-1 0.5L8 2H1v12h10V5z'></path></svg></td></td><td><a href="+hrefurl+" target='blank'><span class='res'>"+eachRes.Kind+ " "+ strToReturn + "</span></a></td></tr></tbody>");
-		}
-		else {
-			$('.tree-browser:last tbody:last').after("<tbody class='js-tree-finder-results'><tr id='searchrow' class='js-navigation-item tree-browser-result'><td id='icon' style='width:21px;padding-left:10px'><svg aria-hidden='true' class='octicon octicon-chevron-right' height='16' role='img' version='1.1' viewBox='0 0 8 16' width='8'><path d='M7.5 8L2.5 13l-1.5-1.5 3.75-3.5L1 4.5l1.5-1.5 5 5z'></path></svg></td><td class='icon'><svg aria-hidden='true' class='octicon octicon-file-text' height='16' role='img' version='1.1' viewBox='0 0 12 16' width='12'><path d='M6 5H2v-1h4v1zM2 8h7v-1H2v1z m0 2h7v-1H2v1z m0 2h7v-1H2v1z m10-7.5v9.5c0 0.55-0.45 1-1 1H1c-0.55 0-1-0.45-1-1V2c0-0.55 0.45-1 1-1h7.5l3.5 3.5z m-1 0.5L8 2H1v12h10V5z'></path></svg></td></td><td><a href="+hrefurl+" target='blank'><span class='res'>"+eachRes.Kind + " " + strToReturn + "</span></a></td></tr></tbody>");
-		}
+			if (i !== dataArray.Defs.length-1) { 
+				$('.tree-browser:last tbody:last').after("<tbody class='js-tree-finder-results'><tr id='searchrow' class='js-navigation-item tree-browser-result' style='border-bottom: 1px solid rgb(238, 238, 238);'><td class='icon' width='21px'><svg aria-hidden='true' class='octicon octicon-chevron-right' height='16' role='img' version='1.1' viewBox='0 0 8 16' width='8'><path d='M7.5 8L2.5 13l-1.5-1.5 3.75-3.5L1 4.5l1.5-1.5 5 5z'></path></svg></td><td class='icon'><svg aria-hidden='true' class='octicon octicon-file-text' height='16' role='img' version='1.1' viewBox='0 0 12 16' width='12'><path d='M6 5H2v-1h4v1zM2 8h7v-1H2v1z m0 2h7v-1H2v1z m0 2h7v-1H2v1z m10-7.5v9.5c0 0.55-0.45 1-1 1H1c-0.55 0-1-0.45-1-1V2c0-0.55 0.45-1 1-1h7.5l3.5 3.5z m-1 0.5L8 2H1v12h10V5z'></path></svg></td></td><td><a href="+hrefurl+" target='blank'><span class='res'>"+eachRes.Kind+ " "+ strToReturn + "</span></a></td></tr></tbody>");
+			}
+			else {
+				$('.tree-browser:last tbody:last').after("<tbody class='js-tree-finder-results'><tr id='searchrow' class='js-navigation-item tree-browser-result'><td id='icon' style='width:21px;padding-left:10px'><svg aria-hidden='true' class='octicon octicon-chevron-right' height='16' role='img' version='1.1' viewBox='0 0 8 16' width='8'><path d='M7.5 8L2.5 13l-1.5-1.5 3.75-3.5L1 4.5l1.5-1.5 5 5z'></path></svg></td><td class='icon'><svg aria-hidden='true' class='octicon octicon-file-text' height='16' role='img' version='1.1' viewBox='0 0 12 16' width='12'><path d='M6 5H2v-1h4v1zM2 8h7v-1H2v1z m0 2h7v-1H2v1z m0 2h7v-1H2v1z m10-7.5v9.5c0 0.55-0.45 1-1 1H1c-0.55 0-1-0.45-1-1V2c0-0.55 0.45-1 1-1h7.5l3.5 3.5z m-1 0.5L8 2H1v12h10V5z'></path></svg></td></td><td><a href="+hrefurl+" target='blank'><span class='res'>"+eachRes.Kind + " " + strToReturn + "</span></a></td></tr></tbody>");
+			}
 
+		}
 	}
 }	
 
@@ -497,7 +501,7 @@ function subsequentAjaxCalls(numScrolls) {
 	}
 	getInfiniteText = $.ajax ({
 		method: "GET", 
-		url: "https://staging3.sourcegraph.com/.api/repos/github.com/"+user+"/"+repo+"@"+branch+"==="+commitID+"/.tree-search?Query="+query+"&QueryType=fixed&N=10&ContextLines=2&Offset="+numScrolls*10
+		url: "https://sourcegraph.com/.api/repos/github.com/"+user+"/"+repo+"@"+branch+"==="+commitID+"/.tree-search?Query="+query+"&QueryType=fixed&N=10&ContextLines=2&Offset="+numScrolls*10
 	}).done(removeLoading, infiniteTextResults)
 	getInfiniteText.fail( function() {
 		removeLoading();
