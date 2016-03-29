@@ -17,8 +17,9 @@ repositories to Sourcegraph.
 
 Install [Gulp](https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md#getting-started) and [NodeJS](https://nodejs.org/en/download/), then install the dependencies:
 ```
-cd chrome/
+cd chromeext/
 npm install
+npm install utf8
 ```
 
 ## Building

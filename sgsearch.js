@@ -419,7 +419,7 @@ function showTextResults(dataArray){
 		var filetype = filetypesplit[filetypesplit.length-1];
 		var startLine = dataArray.SearchResults[i].StartLine;
 		var endLine = dataArray.SearchResults[i].EndLine;
-		var lineNumber = startLine;
+		var lineNumber = startLine+1;
 		var content = window.atob(dataArray.SearchResults[i].Match);
 		var match = query;
 		var regexp = new RegExp (match, 'g');
@@ -533,7 +533,7 @@ function infiniteTextResults(dataArray){
 		var filetype = filetypesplit[filetypesplit.length-1];
 		var startLine = dataArray.SearchResults[i].StartLine;
 		var endLine = dataArray.SearchResults[i].EndLine;
-		var lineNumber = startLine;
+		var lineNumber = startLine+1;
 		var content = window.atob(dataArray.SearchResults[i].Match);
 		var match = query;
 		var regexp = new RegExp (match, 'g');

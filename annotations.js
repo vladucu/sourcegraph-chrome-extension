@@ -79,7 +79,7 @@ function traverseDOM(annsByStartByte, annsByEndByte){
 		var code = row.cells[1]
 		var children = code.childNodes; // We want the children of the <td>
 		var startByte = count;
-		count += code.textContent.length;
+		count += utf8.encode(code.textContent).length;
 		if (code.textContent !== "\n") {
     		count++; // newline
     	}
@@ -113,7 +113,7 @@ function traverseDOM(annsByStartByte, annsByEndByte){
             		
             	if (!consumingSpan) {
             		output += next(childNodeChars[k], startByte, annsByStartByte, annsByEndByte)
-            		startByte++  
+            		startByte += utf8.encode(childNodeChars[k]).length  
                 }
                 else {
                 	output += childNodeChars[k]
@@ -150,7 +150,8 @@ function traverseDOM(annsByStartByte, annsByEndByte){
 function next(c, byteCount, annsByStartByte, annsByEndByte) {
 	/*if (byteCount < 2500) {
 		console.log("byteCount", byteCount, c);
-	console.log(annsByStartByte !== undefined, byteCount);*/
+		//console.log(annsByStartByte !== undefined, byteCount); 
+	}*/
 
 	
 
