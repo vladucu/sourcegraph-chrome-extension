@@ -1,4 +1,5 @@
-//Sourcegraph Token Code Search
+//This file adds code and text search into GitHub 
+
 var url, query, user, repo, branch, 
 	original, table, nomatch, notextmatch,
 	taburl, 
@@ -314,7 +315,7 @@ function ajaxCall() {
 
 	getText = $.ajax ({
 		method: "GET",
-		url: "https://staging3.sourcegraph.com/.api/repos/github.com/"+user+"/"+repo+"@"+branch+"==="+commitID+"/.tree-search?Query="+query+"&QueryType=fixed&N=10&ContextLines=2&Offset=0"
+		url: "https://sourcegraph.com/.api/repos/github.com/"+user+"/"+repo+"@"+branch+"==="+commitID+"/.tree-search?Query="+query+"&QueryType=fixed&N=10&ContextLines=2&Offset=0"
 	}).done(showTextResults, removeTextLoadingDiv);
 	getText.fail(function(jqXHR, textStatus, errorThrown) {
 		//console.log (textStatus);
@@ -382,7 +383,6 @@ function showDefResults(dataArray) {
 
 
 /* --------------------------------------------Text search --------------------------------------------------------------*/
-//https://sourcegraph.com/.ui/github.com/attfarhan/mux@master/.search/text?q=route&PerPage=10&Page=1
 
 //show text results
 function showTextResults(dataArray){

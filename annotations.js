@@ -1,5 +1,6 @@
-var consumingSpan, annotating; 
+//This file adds jump-to-def links in GitHub files 
 
+var consumingSpan, annotating; 
 
 function main() {
 	mainCall();
@@ -76,7 +77,6 @@ function traverseDOM(annsByStartByte, annsByEndByte){
 		// Code is always the second <td> element.
 		//CODE.INNERHTML IS WHAT WE WANT TO REPLACE WITH OUR STRING
 		var code = row.cells[1]
-		//console.log(code.innerHTML)
 		var children = code.childNodes; // We want the children of the <td>
 		var startByte = count;
 		count += code.textContent.length;
@@ -98,7 +98,6 @@ function traverseDOM(annsByStartByte, annsByEndByte){
 				childNodeChars = children[j].outerHTML.split("");    
 			}
 			
-			//console.log(childNodeChars)
 
 			//when we are returning the <span> element, we don't want to increment startByte
 			consumingSpan = false;
@@ -151,14 +150,11 @@ function traverseDOM(annsByStartByte, annsByEndByte){
 function next(c, byteCount, annsByStartByte, annsByEndByte) {
 	/*if (byteCount < 2500) {
 		console.log("byteCount", byteCount, c);
-
-	}*/
-	//console.log(annsByStartByte !== undefined, byteCount);
+	console.log(annsByStartByte !== undefined, byteCount);*/
 
 	
 
 	var matchDetails = annsByStartByte[byteCount];
-	//console.log(matchDetails)
 	
 	//if there is a match
 	if (annotating===false && matchDetails !== undefined) { 
@@ -173,8 +169,6 @@ function next(c, byteCount, annsByStartByte, annsByEndByte) {
 
 	//if we reach the end of the child node - our counter = endByte of the match, annotating = false, close the tag.  
 	if (annotating===true && annsByEndByte[byteCount+1]) {
-		//console.log('end')
-		//console.log(byteCount)
 		annotating = false;
 		return c+"</a>"
 	}
@@ -182,6 +176,7 @@ function next(c, byteCount, annsByStartByte, annsByEndByte) {
 	else {
 
 		return c
+	
 	}
 
 

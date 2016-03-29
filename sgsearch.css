@@ -5,7 +5,7 @@
 tr:hover .octicon-chevron-right{
 	color:#4078c0;
 }
-table {
+#tree-finder-results2 {
 	max-width:978px;
 	width: 100%;
 	word-wrap: break-word !important;
@@ -13,7 +13,7 @@ table {
 	position:relative;
 }
 
-td{
+#tree-finder-results2 td{
     white-space: normal;
     word-wrap: break-word !important;
     padding-right:5px;
@@ -21,7 +21,7 @@ td{
     max-width:668px;
 }
 
-tr{
+#tree-finder-results2 td{
 	max-width:670px;
 }
 
