@@ -16,13 +16,40 @@ function main() {
 function mainCall() {
 
 	var fileElem = document.querySelector('.file .blob-wrapper')
-	if (fileElem) {
-		getAnnotations()
+	var lang;
+	if (fileElem){
+		var finalPath = document.getElementsByClassName('final-path')[0].innerText.split('.')
+		lang = finalPath[finalPath.length-1]
+		if (lang.toLowerCase() === "go") {
+			if (document.getElementsByClassName('vis-private').length !==0){
+				getAuthToken();
+			}
+			else{
+				getAnnotations()
+			}
+		}
 	}
-
+	
 }
 
-function getAnnotations() {
+function getAuthToken(){
+	if (document.getElementsByClassName('vis-private').length !==0){
+		getAuth = $.ajax ({
+			method:"GET",
+			url: "https://sourcegraph.com"
+		}).done(authHandler)
+	}
+}
+
+function authHandler(data) {
+	var doc = (new DOMParser()).parseFromString(data,"text/xml");
+	token = ("x-oauth-basic:"+doc.getElementsByTagName("head")[0].getAttribute('data-current-user-oauth2-access-token'));
+
+	getAnnotations(token)
+}
+
+
+function getAnnotations(token) {
 	url = document.URL;
 	urlsplit = url.split("/");
 	user = urlsplit[3]
@@ -42,7 +69,10 @@ function getAnnotations() {
 	$.ajax ({
 		dataType: "json",
 		method: "GET",
-		url: "https://sourcegraph.com/.api/annotations?Entry.RepoRev.URI=github.com/"+user+"/"+repo+"&Entry.RepoRev.Rev="+branch+"&Entry.RepoRev.CommitID=&Entry.Path="+path+"&Range.StartByte=0&Range.EndByte=0"
+		url: "https://sourcegraph.com/.api/annotations?Entry.RepoRev.URI=github.com/"+user+"/"+repo+"&Entry.RepoRev.Rev="+branch+"&Entry.RepoRev.CommitID=&Entry.Path="+path+"&Range.StartByte=0&Range.EndByte=0",
+		headers: {
+			'authorization': 'Basic ' + window.btoa(token)
+		}
 	}).done(getSourcegraphRefLinks)
 }
 
@@ -62,7 +92,7 @@ function getSourcegraphRefLinks(data) {
 
 
 function traverseDOM(annsByStartByte, annsByEndByte){
-	console.time("traverseDOM"); 
+	//console.time("traverseDOM"); 
 
 	var table = document.querySelector('table');
 	var count = 0;
@@ -141,7 +171,7 @@ function traverseDOM(annsByStartByte, annsByEndByte){
 	if (document.getElementsByClassName('sourcegraph-popover visible').length !== 0){
 		document.getElementsByClassName('sourcegraph-popover visible')[0].classList.remove('visible')
 	}
-	console.timeEnd("traverseDOM")
+	//console.timeEnd("traverseDOM")
 
 }
 

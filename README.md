@@ -4,7 +4,7 @@ This extension enhances file pages on GitHub by annotating code with links to us
 
 You can also browse code on Sourcegraph itself at https://sourcegraph.com.
 
-Currently, Sourcegraph supports <b>Go</b> and <b>Java</b>.  This extension will work on all public Go and Java code as well as most of the popular repositories in Python and JavaScript.  Support for more languages will be rolled out soon - stay tuned!   
+Currently, Sourcegraph supports <b>Go</b>.  This extension will work on all public Go and Java code as well as most of the popular repositories in Python and JavaScript.  Support for more languages will be rolled out soon - stay tuned!   
 
 To use code search on private repositories, code must first be mirrored onto Sourcegraph.com (for free). 
 
@@ -21,6 +21,7 @@ cd chromeext/
 npm install
 npm install utf8
 ```
+ 
 
 ## Building
 
@@ -36,6 +37,11 @@ To inject content from http://localhost:3080 instead of from
 https://sourcegraph.com, run `DEV=1 grunt`. GitHub is HTTPS-only, so you may
 need to [allow mixed content](http://superuser.com/a/487772) temporarily.
 
+
+Currently, you may need to drag some files that are missing into the build folder.
+
+
+
 ## Publishing
 
 To publish a new version:
@@ -46,7 +52,7 @@ To publish a new version:
 1. Bump the version in `manifest.json` to be greater than the current one.
 1. Run `gulp build` to build the extension -> test that it works by loading it into Chrome via *Load Unpacked Extension*!
 1. `cd build/ && zip -r ../../release.zip .` to create the zip.
-1. Click `Upload Updated Package` on the developer dashboard to upload the new `release.zip`.
+1. Click `Upload Updated Package` on the developer dashboard to upload the new `release.zip`.T
 1. Scroll to bottom of page and hit `Publish Changes`.
 
 

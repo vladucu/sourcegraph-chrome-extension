@@ -20,9 +20,10 @@ function sourcegraph_activateDefnPopovers(el) {
     // if (activeA != t) console.log('ACTIVE:', t.href);
     if (activeA != t) {
       activeA = t;
-      //need to add /.ui to URL, so split and take everything after sourcegraph.com
+      //console.log(activeA.href)
       var URLend = activeA.href.split('https://sourcegraph.com')[1]
       var URLtoUse = 'https://sourcegraph.com/.api/repos' + URLend;
+      //console.log(URLtoUse)
       ajaxGet(URLtoUse, function(html) {
         if (activeA) showPopover(html);
       });

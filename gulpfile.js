@@ -18,6 +18,8 @@ var context = {
   url: (process.env.DEV ? 'http://localhost:3080' : 'https://sourcegraph.com'),
 };
 
+
+
 // Clean build directory
 gulp.task('clean', function() {
   return gulp.src('build/*', {read: false})
@@ -39,7 +41,18 @@ gulp.task('html', function() {
     .pipe(cleanhtml())
     .pipe(gulp.dest('build'));
 });
+gulp.task('copy', function() {
+  gulp.src('manifest.json')
+    .pipe(template(context))
+    .pipe(gulp.dest('build'));    
+  return gulp.src(['manifest.json']).pipe(gulp.dest('build'));
+});
 
+gulp.task('copy', function() {
+  gulp.src('sgsearch.css')
+    .pipe(gulp.dest('build'));
+  return gulp.src(['sgsearch.css']).pipe(gulp.dest('build'));
+});
 // Run scripts through JSHint
 gulp.task('jshint', function() {
   return gulp.src(['*.js', '!gulpfile.js'])
