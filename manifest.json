@@ -13,10 +13,6 @@
 		
 		}],
 	"web_accessible_resources": ["utf8.js", "sgsearch.css", "defn_popover.css", "assets/t.png", "/assets/src4.png", "/assets/search.png"],
-	"background": {
-		"scripts": ["background_page.js"]
-
-	},
 	"permissions": [
 		"activeTab",
 		"https://*.sourcegraph.com/*",
