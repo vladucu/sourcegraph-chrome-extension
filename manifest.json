@@ -9,7 +9,7 @@
 		{
 		"matches": ["https://github.com/*"],
 		"css": ["sgsearch.css", "defn_popover.css"],
-		"js": ["jquery-1.12.2.js", "annotations.js", "sgsearch.js", "defn-popover.js", "utf8.js"]
+		"js": ["jquery-1.12.2.js", "amplitude.js", "annotations.js", "sgsearch.js", "defn-popover.js", "utf8.js"]
 		
 		}],
 	"web_accessible_resources": ["utf8.js", "sgsearch.css", "defn_popover.css", "assets/t.png", "/assets/src4.png", "/assets/search.png"],
@@ -19,6 +19,6 @@
 		"storage"
 		],
 
-  "content_security_policy": "script-src 'self' https://d24n15hnbwhuhn.cloudfront.net; object-src 'self'"
+  "content_security_policy": "script-src 'self' https://d24n15hnbwhuhn.cloudfront.net/libs/amplitude-2.10.0-min.gz.js; object-src 'self'"
 
 }

@@ -18,6 +18,11 @@ function mainCall() {
 	var fileElem = document.querySelector('.file .blob-wrapper')
 	var lang;
 	if (fileElem){
+		document.addEventListener('click', function(e){
+			if (e.target.className === 'sgdef') {
+			amplitude.logEvent('JumpToDefinition')
+			}
+		})
 		var finalPath = document.getElementsByClassName('final-path')[0].innerText.split('.')
 		lang = finalPath[finalPath.length-1]
 		if (lang.toLowerCase() === "go") {
